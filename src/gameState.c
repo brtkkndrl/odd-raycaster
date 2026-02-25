@@ -45,8 +45,10 @@ void GameState_init(GameState *gameState, SDL_Renderer *renderer, TTF_Font *font
     KeysArray_init(&(gameState->keys));
     EnemyArray_init(&(gameState->enemies), 1);
 
-    for (int i = 0; i < 1; i++)
-        EnemyArray_add(&(gameState->enemies), 2 + i * 2.f, 2);
+    for (int i = 0; i < 1; i++){
+        Enemy e = Enemy_create(Vector2f_create(2 + i * 2.f, 2));
+        EnemyArray_add(&(gameState->enemies), e);
+    }
 
     EntityArray_init(&(gameState->enemyProjectiles), 32, sizeof(Projectile));
 

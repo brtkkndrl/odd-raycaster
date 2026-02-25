@@ -1,6 +1,13 @@
 #include "vec2f.h"
 #include <math.h>
 
+Vector2f Vector2f_create(float x, float y){
+    Vector2f v;
+    v.x = x;
+    v.y = y;
+    return v;
+}
+
 Vector2f Vector2f_add(Vector2f a, Vector2f b)
 {
     Vector2f c;

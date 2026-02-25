@@ -6,6 +6,8 @@ typedef struct Vector2f
     float x, y;
 } Vector2f;
 
+Vector2f Vector2f_create(float x, float y);
+
 Vector2f Vector2f_add(Vector2f, Vector2f);
 
 Vector2f Vector2f_sub(Vector2f, Vector2f);

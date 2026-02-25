@@ -21,6 +21,8 @@ typedef struct Enemy
     float width;
 } Enemy;
 
+Enemy Enemy_create(Vector2f pos);
+
 typedef struct EnemyArray
 {
     int size;
@@ -32,7 +34,7 @@ void EnemyArray_init(EnemyArray *ea, int s);
 
 void EnemyArray_free(EnemyArray *ea);
 
-void EnemyArray_add(EnemyArray *ea, float x, float y);
+void EnemyArray_add(EnemyArray *ea, Enemy e);
 
 void Enemy_takeDamage(Enemy *e);
 

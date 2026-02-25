@@ -14,13 +14,17 @@ void EnemyArray_free(EnemyArray *ea)
     free(ea->enemies);
 }
 
-void EnemyArray_add(EnemyArray *ea, float x, float y)
+void EnemyArray_add(EnemyArray *ea, Enemy e)
 {
     if (ea->size == ea->capacity)
         return;
+    ea->enemies[ea->size] = e;
+    ea->size++;
+}
+
+Enemy Enemy_create(Vector2f pos){
     Enemy e;
-    e.pos.x = x;
-    e.pos.y = y;
+    e.pos = pos;
     e.circle.p.x = 4.5f;
     e.circle.p.y = 4.5f;
     e.circle.r = ENEMY_WIDTH * 0.5f;
@@ -28,8 +32,7 @@ void EnemyArray_add(EnemyArray *ea, float x, float y)
     e.attackTimeCounter = 0.0f;
     e.hitAnimTimeCounter = 0.0f;
     e.isHitAnimPlaying = false;
-    ea->enemies[ea->size] = e;
-    ea->size++;
+    return e;
 }
 
 Sprite Enemy_getSprite(Enemy *e)
