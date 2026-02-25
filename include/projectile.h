@@ -14,20 +14,7 @@ typedef struct Projectile
     float lifetime;
 } Projectile;
 
-typedef struct ProjectileArray
-{
-    int size;
-    int capacity;
-    Projectile *arr;
-} ProjectileArray;
-
-void ProjectileArray_init(ProjectileArray *arr, int s);
-
-void ProjectileArray_free(ProjectileArray *arr);
-
-void ProjectileArray_add(ProjectileArray *arr, Projectile p);
-
-void ProjectileArray_remove(ProjectileArray *arr, int index);
+Projectile Projectile_create(Vector2f pos, Vector2f dir, float radius);
 
 Sprite Projectile_getSprite(Projectile *e);
 

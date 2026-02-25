@@ -48,8 +48,7 @@ void GameState_init(GameState *gameState, SDL_Renderer *renderer, TTF_Font *font
     for (int i = 0; i < 1; i++)
         EnemyArray_add(&(gameState->enemies), 2 + i * 2.f, 2);
 
-    ProjectileArray_init(&(gameState->enemyProjectiles), 32);
-    // add_procetile(&(gameState->enemy_projectiles), 6, 6);
+    EntityArray_init(&(gameState->enemyProjectiles), 32, sizeof(Projectile));
 
     Map_init(&gameState->map);
 
@@ -87,7 +86,7 @@ void GameState_free(GameState *gameState)
     Map_free(&gameState->map);
     EnemyArray_free(&gameState->enemies);
     free(gameState->rays);
-    ProjectileArray_free(&(gameState->enemyProjectiles));
+    EntityArray_free(&(gameState->enemyProjectiles));
     TextureXAspectRation_free(&(gameState->youDiedText));
 
     SDL_FreeSurface(gameState->screenSurface);
@@ -138,11 +137,11 @@ void GameState_event(GameState *gameState, SDL_Event event)
     }
 }
 
-void GameState_updateProjectiles(ProjectileArray *projectiles, float delta)
+void GameState_updateProjectiles(EntityArray *projectiles, float delta)
 {
     for (int i = 0; i < projectiles->size; i++)
     {
-        Projectile *p = &(projectiles->arr[i]);
+        Projectile *p = (Projectile*) EntityArray_get(projectiles, i); 
         p->pos.x = p->pos.x + p->dir.x * delta * 3;
         p->pos.y = p->pos.y + p->dir.y * delta * 3;
         p->circle.p.x = p->pos.x;
@@ -150,7 +149,7 @@ void GameState_updateProjectiles(ProjectileArray *projectiles, float delta)
         p->lifetime += delta;
         if (p->lifetime >= 10.0f)
         {
-            ProjectileArray_remove(projectiles, i);
+            EntityArray_remove(projectiles, i);
             i--;
         }
     }
@@ -244,7 +243,7 @@ void GameState_draw(GameState *gameState, SDL_Renderer *renderer)
 
         for (int i = 0; i < gameState->enemyProjectiles.size; i++)
         {
-            Sprite s = Projectile_getSprite(&(gameState->enemyProjectiles.arr[i]));
+            Sprite s = Projectile_getSprite((Projectile*)EntityArray_get(&(gameState->enemyProjectiles), i));
             s.distanceToPlayerSquared = distanceSquared(s.pos.x, s.pos.y, gameState->player.pos.x, gameState->player.pos.y);
             SpriteArray_add(&sprites, s);
         }
@@ -366,7 +365,7 @@ void GameState_update(GameState *gameState, float delta)
     KeysArray_update(&(gameState->keys)); // call after done using keys in the iteration
 }
 
-void GameState_updateEnemies(EnemyArray *enemies, ProjectileArray *enemy_projectiles, Player *player, float delta)
+void GameState_updateEnemies(EnemyArray *enemies, EntityArray *enemy_projectiles, Player *player, float delta)
 {
     for (int i = 0; i < enemies->size; i++)
     {
@@ -385,14 +384,8 @@ void GameState_updateEnemies(EnemyArray *enemies, ProjectileArray *enemy_project
         e->attackTimeCounter += delta;
         if (e->attackTimeCounter >= ENEMY_SHOOT_DELAY)
         {
-            Projectile p;
-            p.pos = e->pos;
-            p.dir = Vector2f_norm(Vector2f_sub(player->pos, e->pos));
-            p.lifetime = 0.0f;
-            p.circle.p.x = p.pos.x;
-            p.circle.p.y = p.pos.y;
-            p.circle.r = 0.1f;
-            ProjectileArray_add(enemy_projectiles, p);
+            Projectile p = Projectile_create(e->pos, Vector2f_norm(Vector2f_sub(player->pos, e->pos)), 0.1f);
+            EntityArray_add(enemy_projectiles, &p);
             e->attackTimeCounter = 0.0f;
         } //
 

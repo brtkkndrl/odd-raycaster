@@ -1,39 +1,5 @@
 #include "projectile.h"
 
-void ProjectileArray_init(ProjectileArray *arr, int s)
-{
-    arr->size = 0;
-    arr->capacity = s;
-    arr->arr = calloc(s, sizeof(Projectile));
-    if (arr->arr == NULL)
-        exit(1);
-}
-
-void ProjectileArray_free(ProjectileArray *arr)
-{
-    free(arr->arr);
-}
-
-void ProjectileArray_add(ProjectileArray *arr, Projectile p)
-{
-    if (arr->size == arr->capacity)
-        return;
-    arr->arr[arr->size] = p;
-    arr->size++;
-}
-
-void ProjectileArray_remove(ProjectileArray *arr, int index)
-{
-    if (index < 0 || index >= arr->size)
-        return;
-
-    for (int i = index; i < arr->size - 1; i++)
-    {
-        arr->arr[i] = arr->arr[i + 1];
-    }
-    arr->size--;
-}
-
 Sprite Projectile_getSprite(Projectile *e)
 {
     Sprite s;
@@ -43,4 +9,15 @@ Sprite Projectile_getSprite(Projectile *e)
     s.tw = 32;
     s.th = 32;
     return s;
+}
+
+Projectile Projectile_create(Vector2f pos, Vector2f dir, float radius){
+    Projectile p;
+    p.pos = pos;
+    p.circle.p.x = p.pos.x;
+    p.circle.p.y = p.pos.y;
+    p.circle.r = 0.1f;
+    p.dir = dir;
+    p.lifetime = 0.0f;
+    return p;
 }

@@ -43,14 +43,14 @@ void resCollEnemyArrayXMap(EnemyArray *enemies, Map *map)
     }
 }
 
-void resCollProjectileArrayXMap(ProjectileArray *projectiles, Map *map)
+void resCollProjectileArrayXMap(EntityArray *projectiles, Map *map)
 {
     for (int i = 0; i < projectiles->size; i++) // ENEMY WALL
     {
-        Projectile *p = &(projectiles->arr[i]);
+        Projectile *p = (Projectile*)EntityArray_get(projectiles, i);
         if (isCollCircleEntityXMap(p->circle, map))
         {
-            ProjectileArray_remove(projectiles, i);
+            EntityArray_remove(projectiles, i);
             i--;
         }
     }
@@ -175,14 +175,14 @@ void resCollCircleEntityXMap(Vector2f *entityPos, c2Circle entityCircle, Map *ma
     }
 }
 
-void resCollPlayerXProjectileArray(Player *player, ProjectileArray *projectiles)
+void resCollPlayerXProjectileArray(Player *player, EntityArray* projectiles)
 {
     for (int i = 0; i < projectiles->size; i++)
     {
-        Projectile *p = &(projectiles->arr[i]);
+        Projectile *p = (Projectile*)EntityArray_get(projectiles, i); 
         if (c2CircletoCircle(p->circle, player->circle))
         {
-            ProjectileArray_remove(projectiles, i);
+            EntityArray_remove(projectiles, i);
             i--;
             Player_takeHit(player);
             if (player->isDead)

@@ -17,7 +17,7 @@ typedef struct GameState
     Player player;
     Map map;
     EnemyArray enemies;
-    ProjectileArray enemyProjectiles;
+    EntityArray enemyProjectiles;
     KeysArray keys;
     float depthBuffer[SCREEN_WIDTH];
     SDL_Surface *screenSurface;
@@ -44,9 +44,9 @@ void GameState_init(GameState *gameState, SDL_Renderer *renderer, TTF_Font *font
 void GameState_free(GameState *gameState);
 void GameState_event(GameState *gameState, SDL_Event event);
 void GameState_update(GameState *gameState, float delta);
-void GameState_updateEnemies(EnemyArray *enemies, ProjectileArray *enemy_projectiles, Player *player, float delta);
+void GameState_updateEnemies(EnemyArray *enemies, EntityArray *enemy_projectiles, Player *player, float delta);
 void GameState_playerAttackEnemiesRaycast(EnemyArray *enemies, Player *player, Map *map, float maxDistance);
-void GameState_updateProjectiles(ProjectileArray *projectiles, float delta);
+void GameState_updateProjectiles(EntityArray *projectiles, float delta);
 void GameState_draw(GameState *gameState, SDL_Renderer *renderer);
 void GameState_playerAttackEnemies(EnemyArray *enemies, Player *player, Map *map);
 
