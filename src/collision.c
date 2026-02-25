@@ -33,12 +33,12 @@ void resCollPlayerXMap(Player *player, Map *map)
     resCollCircleEntityXMap(&player->pos, player->circle, map);
 }
 
-void resCollEnemyArrayXMap(EnemyArray *enemies, Map *map)
+void resCollEnemyArrayXMap(EntityArray *enemies, Map *map)
 {
 
     for (int i = 0; i < enemies->size; i++) // ENEMY WALL
     {
-        Enemy *e = &enemies->enemies[i];
+        Enemy *e = (Enemy*) EntityArray_get(enemies, i);
         resCollCircleEntityXMap(&e->pos, e->circle, map);
     }
 }

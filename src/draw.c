@@ -80,7 +80,7 @@ void drawText(SDL_Renderer *renderer, SDL_Texture *texture, int sx, int sy, char
 }
 
 
-void drawMap(SDL_Renderer *renderer, Player *player, EnemyArray *enemies, Ray *rays, int iRayCount, Map *map)
+void drawMap(SDL_Renderer *renderer, Player *player, EntityArray *enemies, Ray *rays, int iRayCount, Map *map)
 {
     /* const int BLOCK_SIZE = 6;
      const int FRAME_SIZE = 1;

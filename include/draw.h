@@ -7,6 +7,7 @@
 #include "player.h"
 #include "rays.h"
 #include "enemy.h"
+#include "entityArray.h"
 #include "global.h"
 #include "utils.h"
 #include "sprite.h"
@@ -55,7 +56,7 @@ ScalingData ScalingData_create(SDL_Renderer *renderer);
 void *drawFloor_threaded(void *vargp);
 void *drawWalls_threaded(void *vargp);
 void drawText(SDL_Renderer *renderer, SDL_Texture *texture, int sx, int sy, char *text);
-void drawMap(SDL_Renderer *renderer, Player *player, EnemyArray *enemies, Ray *rays, int iRayCount, Map *map);
+void drawMap(SDL_Renderer *renderer, Player *player, EntityArray *enemies, Ray *rays, int iRayCount, Map *map);
 void drawWeapon(SDL_Renderer *renderer, Player *player, SDL_Texture *gun_texture, ScalingData *scalingInfo);
 void drawBar(SDL_Renderer *renderer, Player *player, SDL_Texture *bar_texture, ScalingData *scalingInfo);
 void drawPausedBar(SDL_Renderer *renderer, TTF_Font *font, ScalingData *scalingInfo, int selectedOption);

@@ -23,19 +23,6 @@ typedef struct Enemy
 
 Enemy Enemy_create(Vector2f pos);
 
-typedef struct EnemyArray
-{
-    int size;
-    int capacity;
-    Enemy *enemies;
-} EnemyArray;
-
-void EnemyArray_init(EnemyArray *ea, int s);
-
-void EnemyArray_free(EnemyArray *ea);
-
-void EnemyArray_add(EnemyArray *ea, Enemy e);
-
 void Enemy_takeDamage(Enemy *e);
 
 Sprite Enemy_getSprite(Enemy *e);

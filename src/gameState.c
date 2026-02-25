@@ -43,11 +43,11 @@ void GameState_init(GameState *gameState, SDL_Renderer *renderer, TTF_Font *font
     ///////
     Player_init(&(gameState->player));
     KeysArray_init(&(gameState->keys));
-    EnemyArray_init(&(gameState->enemies), 1);
+    EntityArray_init(&(gameState->enemies), 128, sizeof(Enemy));
 
     for (int i = 0; i < 1; i++){
         Enemy e = Enemy_create(Vector2f_create(2 + i * 2.f, 2));
-        EnemyArray_add(&(gameState->enemies), e);
+        EntityArray_add(&(gameState->enemies), &e);
     }
 
     EntityArray_init(&(gameState->enemyProjectiles), 32, sizeof(Projectile));
@@ -86,9 +86,9 @@ void GameState_init(GameState *gameState, SDL_Renderer *renderer, TTF_Font *font
 void GameState_free(GameState *gameState)
 {
     Map_free(&gameState->map);
-    EnemyArray_free(&gameState->enemies);
     free(gameState->rays);
     EntityArray_free(&(gameState->enemyProjectiles));
+    EntityArray_free(&gameState->enemies);
     TextureXAspectRation_free(&(gameState->youDiedText));
 
     SDL_FreeSurface(gameState->screenSurface);
@@ -238,7 +238,7 @@ void GameState_draw(GameState *gameState, SDL_Renderer *renderer)
 
         for (int i = 0; i < gameState->enemies.size; i++)
         {
-            Sprite s = Enemy_getSprite(&(gameState->enemies.enemies[i]));
+            Sprite s = Enemy_getSprite((Enemy*)EntityArray_get(&(gameState->enemies), i));
             s.distanceToPlayerSquared = distanceSquared(s.pos.x, s.pos.y, gameState->player.pos.x, gameState->player.pos.y);
             SpriteArray_add(&sprites, s);
         }
@@ -367,11 +367,11 @@ void GameState_update(GameState *gameState, float delta)
     KeysArray_update(&(gameState->keys)); // call after done using keys in the iteration
 }
 
-void GameState_updateEnemies(EnemyArray *enemies, EntityArray *enemy_projectiles, Player *player, float delta)
+void GameState_updateEnemies(EntityArray *enemies, EntityArray *enemy_projectiles, Player *player, float delta)
 {
     for (int i = 0; i < enemies->size; i++)
     {
-        Enemy *e = &enemies->enemies[i];
+        Enemy *e = (Enemy*)EntityArray_get(enemies, i);
 
         // MOVE ENEMY
         Vector2f dirToPlayer = Vector2f_sub(player->pos, e->pos);
@@ -402,7 +402,7 @@ void GameState_updateEnemies(EnemyArray *enemies, EntityArray *enemy_projectiles
     }
 }
 
-void GameState_playerAttackEnemies(EnemyArray *enemies, Player *player, Map *map)
+void GameState_playerAttackEnemies(EntityArray *enemies, Player *player, Map *map)
 {
     if (player->isJustAttacked)
     {
@@ -421,13 +421,13 @@ void GameState_playerAttackEnemies(EnemyArray *enemies, Player *player, Map *map
     }
 }
 
-void GameState_playerAttackEnemiesRaycast(EnemyArray *enemies, Player *player, Map *map, float maxDistance)
+void GameState_playerAttackEnemiesRaycast(EntityArray *enemies, Player *player, Map *map, float maxDistance)
 {
     Ray ray = castOneRay(player->pos, player->dir, map);
 
     for (int i = 0; i < enemies->size; i++)
     {
-        Enemy *e = &enemies->enemies[i];
+        Enemy *e = (Enemy*)EntityArray_get(enemies, i);
         float dist = rayPointDistSquared(player->pos, player->dir, e->pos);
         if (dist <= e->width * 0.5f * e->width * 0.5f)
         {

@@ -1,27 +1,5 @@
 #include "enemy.h"
 
-void EnemyArray_init(EnemyArray *ea, int s)
-{
-    ea->size = 0;
-    ea->capacity = s;
-    ea->enemies = calloc(s, sizeof(Enemy));
-    if (ea->enemies == NULL)
-        exit(1);
-}
-
-void EnemyArray_free(EnemyArray *ea)
-{
-    free(ea->enemies);
-}
-
-void EnemyArray_add(EnemyArray *ea, Enemy e)
-{
-    if (ea->size == ea->capacity)
-        return;
-    ea->enemies[ea->size] = e;
-    ea->size++;
-}
-
 Enemy Enemy_create(Vector2f pos){
     Enemy e;
     e.pos = pos;
