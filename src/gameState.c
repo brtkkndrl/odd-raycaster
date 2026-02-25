@@ -167,6 +167,17 @@ void GameState_draw(GameState *gameState, SDL_Renderer *renderer)
     SDL_Rect DestR;
 
     ScalingData scalingInfo = ScalingData_create(renderer);
+    
+    //TODO use settings, read from args
+    const bool drawFloor = true;
+    const bool drawThreaded = true;
+
+    if(!drawFloor){
+        SDL_Rect topRect = {0,0,SCREEN_WIDTH, SCREEN_HEIGHT/2};
+        SDL_Rect bottomRect = {0,SCREEN_HEIGHT/2,SCREEN_WIDTH, SCREEN_HEIGHT/2};
+        SDL_FillRect(gameState->screenSurface, &bottomRect, SDL_MapRGB(gameState->screenSurface->format, 30, 30, 30));
+        SDL_FillRect(gameState->screenSurface, &topRect, SDL_MapRGB(gameState->screenSurface->format, 120, 120, 120));
+    }
 
     if (!gameState->isPaused)
     {
@@ -174,45 +185,47 @@ void GameState_draw(GameState *gameState, SDL_Renderer *renderer)
         if (!gameState->player.isDead)
         {
             SDL_LockSurface(gameState->screenSurface);
+
+            
+
 ///
-#ifdef THREADED_FLOOR_RENDERING
+            if(drawThreaded){
+                pthread_t threads[THREAD_COUNT];
+                DrawFloorThreadData floor_thread_data[THREAD_COUNT];
+                for (int i = 0; i < THREAD_COUNT; i++)
+                {
+                    floor_thread_data[i].player = &(gameState->player);
+                    floor_thread_data[i].screenSurface = gameState->screenSurface;
+                    floor_thread_data[i].wallsSurface = gameState->wallsSurface;
+                    floor_thread_data[i].startY = i * (SCREEN_HEIGHT / THREAD_COUNT);
+                    floor_thread_data[i].endY = (i + 1) * (SCREEN_HEIGHT / THREAD_COUNT);
+                }
+                for (int i = 0; i < THREAD_COUNT; i++)
+                    pthread_create(&threads[i], NULL, drawFloor_threaded, (void *)&floor_thread_data[i]);
+                for (int i = 0; i < THREAD_COUNT; i++)
+                    pthread_join(threads[i], NULL);
 
-            pthread_t threads[THREAD_COUNT];
-            DrawFloorThreadData floor_thread_data[THREAD_COUNT];
-            for (int i = 0; i < THREAD_COUNT; i++)
-            {
-                floor_thread_data[i].player = &(gameState->player);
-                floor_thread_data[i].screenSurface = gameState->screenSurface;
-                floor_thread_data[i].wallsSurface = gameState->wallsSurface;
-                floor_thread_data[i].startY = i * (SCREEN_HEIGHT / THREAD_COUNT);
-                floor_thread_data[i].endY = (i + 1) * (SCREEN_HEIGHT / THREAD_COUNT);
+                DrawWallsThreadData walls_thread_data[THREAD_COUNT];
+                for (int i = 0; i < THREAD_COUNT; i++)
+                {
+                    walls_thread_data[i].player = &(gameState->player);
+                    walls_thread_data[i].screenSurface = gameState->screenSurface;
+                    walls_thread_data[i].wallsSurface = gameState->wallsSurface;
+                    walls_thread_data[i].rays = gameState->rays;
+                    walls_thread_data[i].zBuffer = gameState->depthBuffer;
+                    walls_thread_data[i].startX = i * (SCREEN_WIDTH / THREAD_COUNT);
+                    walls_thread_data[i].endX = (i + 1) * (SCREEN_WIDTH / THREAD_COUNT);
+                }
+
+                for (int i = 0; i < THREAD_COUNT; i++)
+                    pthread_create(&threads[i], NULL, drawWalls_threaded, (void *)&walls_thread_data[i]);
+                for (int i = 0; i < THREAD_COUNT; i++)
+                    pthread_join(threads[i], NULL);
+            }else{
+                if(drawFloor)
+                    drawFloorNCeiling(gameState->screenSurface, &gameState->player, gameState->wallsSurface, 0, SCREEN_HEIGHT);
+                drawWalls(gameState->screenSurface, &gameState->player, gameState->rays, gameState->depthBuffer, gameState->wallsSurface, 0, SCREEN_WIDTH);
             }
-            for (int i = 0; i < THREAD_COUNT; i++)
-                pthread_create(&threads[i], NULL, drawFloor_threaded, (void *)&floor_thread_data[i]);
-            for (int i = 0; i < THREAD_COUNT; i++)
-                pthread_join(threads[i], NULL);
-
-            DrawWallsThreadData walls_thread_data[THREAD_COUNT];
-            for (int i = 0; i < THREAD_COUNT; i++)
-            {
-                walls_thread_data[i].player = &(gameState->player);
-                walls_thread_data[i].screenSurface = gameState->screenSurface;
-                walls_thread_data[i].wallsSurface = gameState->wallsSurface;
-                walls_thread_data[i].rays = gameState->rays;
-                walls_thread_data[i].zBuffer = gameState->depthBuffer;
-                walls_thread_data[i].startX = i * (SCREEN_WIDTH / THREAD_COUNT);
-                walls_thread_data[i].endX = (i + 1) * (SCREEN_WIDTH / THREAD_COUNT);
-            }
-
-            for (int i = 0; i < THREAD_COUNT; i++)
-                pthread_create(&threads[i], NULL, drawWalls_threaded, (void *)&walls_thread_data[i]);
-            for (int i = 0; i < THREAD_COUNT; i++)
-                pthread_join(threads[i], NULL);
-#else
-            draw_floor_and_ceiling(gameState->screenSurface, &gameState->player, gameState->walls_surface, 0, SCREEN_HEIGHT);
-
-            draw_walls(gameState->screenSurface, &gameState->player, gameState->rays, gameState->fZBuffer, gameState->walls_surface, 0, SCREEN_WIDTH);
-#endif
             ///
 
             SDL_UnlockSurface(gameState->screenSurface);
