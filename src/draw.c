@@ -82,8 +82,7 @@ void drawText(SDL_Renderer *renderer, SDL_Texture *texture, int sx, int sy, char
 
 void drawMap(SDL_Renderer *renderer, Player *player, EntityArray *enemies, Ray *rays, int iRayCount, Map *map)
 {
-    //TODO render to a map texture
-    const int BLOCK_SIZE = 15;
+    const int BLOCK_SIZE = 10;
     const int FRAME_SIZE = 1;
     const SDL_Color WALL_COLOR = {0, 0, 255};
     const SDL_Color FRAME_COLOR = {255, 255, 0};
