@@ -267,7 +267,7 @@ void GameState_draw(GameState *gameState, SDL_Renderer *renderer)
 
         SpriteArray_free(&sprites);
 
-        // draw_map(renderer, &gameState->player, &(gameState->enemies), gameState->rays, SCREEN_WIDTH, &gameState->map);
+        drawMap(renderer, &gameState->player, &(gameState->enemies), gameState->rays, SCREEN_WIDTH, &gameState->map);
 
         drawWeapon(renderer, &gameState->player, gameState->gunTexture, &scalingInfo);
 

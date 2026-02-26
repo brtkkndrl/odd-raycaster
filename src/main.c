@@ -2,6 +2,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <math.h>
+#include <errno.h>
 #include "SDL2/SDL.h"
 #include "SDL2/SDL_ttf.h"
 
@@ -55,11 +56,15 @@ int main(int argc, char *argv[])
     (void)argv;
 
     // Initialize SDL
-    if (SDL_Init(SDL_INIT_VIDEO) < 0)
+    if (SDL_Init(SDL_INIT_VIDEO) < 0){
+        fprintf(stderr, "Failed to initialize SDL, errno: %i\n", errno);
         exit(1);
+    }
 
-    if (TTF_Init() < 0)
+    if (TTF_Init() < 0){
+        fprintf(stderr, "Failed to initialize TTF, errno: %i\n", errno);
         exit(1);
+    }
 
     SDL_Window *window = SDL_CreateWindow("raycaster",
                                           SDL_WINDOWPOS_UNDEFINED,
@@ -87,8 +92,10 @@ int main(int argc, char *argv[])
     int iFrameCounter = 0;
     int fps = 0;
     TTF_Font *font = TTF_OpenFont("../assets/font/pixel-ultima-regular.ttf", 42);
-    if (font == NULL)
-        exit(1);
+    if (font == NULL){
+        fprintf(stderr, "Failed to load font, errno: %i\n", errno);
+        exit(errno);
+    }
 
     // gameState_init(&gameState, renderer, font);
     MenuState_init(&menuState, renderer, font);
