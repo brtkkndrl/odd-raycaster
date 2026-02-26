@@ -91,31 +91,15 @@ void drawMap(SDL_Renderer *renderer, Player *player, EntityArray *enemies, Ray *
     const int texWidth = map->width * BLOCK_SIZE + FRAME_SIZE * 2;
     const int texHeight = map->height * BLOCK_SIZE + FRAME_SIZE * 2;
 
-    SDL_Texture* mapTex = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_TARGET, 10, 10);
+    SDL_Texture* mapTex = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_TARGET, texWidth, texHeight);
 
     SDL_SetRenderTarget(renderer, mapTex);//Render to texture
 
-    SDL_Rect squareRect;
-    squareRect.x = 0;
-    squareRect.y = 0;
-    squareRect.w = map->width * BLOCK_SIZE + FRAME_SIZE * 2;
-    squareRect.h = map->height * BLOCK_SIZE + FRAME_SIZE * 2;
 
     SDL_SetRenderDrawColor(renderer, FRAME_COLOR.r, FRAME_COLOR.g, FRAME_COLOR.b, 255);
-    SDL_RenderFillRect(renderer, NULL);
+    SDL_RenderFillRect(renderer, NULL);//Base outline
 
-    SDL_SetRenderTarget(renderer, NULL);//Render to screen
-
-
-    SDL_Rect texDstRect = {
-        30, 30, texWidth, texHeight
-    };
-    SDL_RenderCopy(renderer, mapTex, NULL, &texDstRect);
-
-    SDL_DestroyTexture(mapTex);
-
-    return;
-
+    SDL_Rect squareRect;
     squareRect.x = FRAME_SIZE;
     squareRect.y = FRAME_SIZE;
     squareRect.w = map->width * BLOCK_SIZE;
@@ -232,16 +216,25 @@ void drawMap(SDL_Renderer *renderer, Player *player, EntityArray *enemies, Ray *
     // draw entities
     for (int i = 0; i < enemies->size; i++)
     {
-        Enemy* e = (Enemy*)EntityArray_get(enemies, i);
+        const Enemy* e = (const Enemy*)EntityArray_get(enemies, i);
         squareRect.x = e->pos.x * BLOCK_SIZE;
         squareRect.y = e->pos.y * BLOCK_SIZE;
         squareRect.w = BLOCK_SIZE / 2;
         squareRect.h = BLOCK_SIZE / 2;
         // printf("%f %f\n", enemies->enemies[i].pos.x, enemies->enemies[i].pos.y);
 
-        SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
         SDL_RenderFillRect(renderer, &squareRect);
     }
+
+
+
+    SDL_SetRenderTarget(renderer, NULL);//Stop rendering to texture
+    SDL_Rect texDstRect = {
+        30, 30, texWidth, texHeight
+    };
+    SDL_RenderCopy(renderer, mapTex, NULL, &texDstRect);//Render texture to screen
+    SDL_DestroyTexture(mapTex);//Free texture
 }
 
 
