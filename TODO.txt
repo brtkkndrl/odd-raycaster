@@ -27,3 +27,4 @@ BUG: cant see more than 1 enemy
 migrate to SDL3
 ability to render to ASCII in terminal
 options to render floor, use threads, from command line args
+use SDL_GetError

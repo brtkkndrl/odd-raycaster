@@ -88,6 +88,13 @@ void drawMap(SDL_Renderer *renderer, Player *player, EntityArray *enemies, Ray *
     const SDL_Color WALL_COLOR = {0, 0, 255};
     const SDL_Color FRAME_COLOR = {255, 255, 0};
 
+    const int texWidth = map->width * BLOCK_SIZE + FRAME_SIZE * 2;
+    const int texHeight = map->height * BLOCK_SIZE + FRAME_SIZE * 2;
+
+    SDL_Texture* mapTex = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_TARGET, 10, 10);
+
+    SDL_SetRenderTarget(renderer, mapTex);//Render to texture
+
     SDL_Rect squareRect;
     squareRect.x = 0;
     squareRect.y = 0;
@@ -95,7 +102,19 @@ void drawMap(SDL_Renderer *renderer, Player *player, EntityArray *enemies, Ray *
     squareRect.h = map->height * BLOCK_SIZE + FRAME_SIZE * 2;
 
     SDL_SetRenderDrawColor(renderer, FRAME_COLOR.r, FRAME_COLOR.g, FRAME_COLOR.b, 255);
-    SDL_RenderFillRect(renderer, &squareRect);
+    SDL_RenderFillRect(renderer, NULL);
+
+    SDL_SetRenderTarget(renderer, NULL);//Render to screen
+
+
+    SDL_Rect texDstRect = {
+        30, 30, texWidth, texHeight
+    };
+    SDL_RenderCopy(renderer, mapTex, NULL, &texDstRect);
+
+    SDL_DestroyTexture(mapTex);
+
+    return;
 
     squareRect.x = FRAME_SIZE;
     squareRect.y = FRAME_SIZE;
